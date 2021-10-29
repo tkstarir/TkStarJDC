@@ -1,10 +1,10 @@
 # TkStarJDC
 
-TkStar Jalali Date Class + Occasions and Holidays
+TkStar Jalali Date Class + **Occasions** and **Holidays**
 
-Fully comprehensive PHP library for jalali and gregorian date converting to each other with occasions of both gregorian and galali in a Single Class
+Fully comprehensive PHP library for jalali and gregorian date converting to each other with **Occasions** of both gregorian and galali in a Single Class
 
-Coming Soon: Lunar support for occasions and date converter
+Coming Soon: Lunar support for **Occasions**, **Holidays** and Date Converting ...
 
 Date Converter Symbols: **_a A c d D F g G h H i j l m M n r s S t w W Y U z_**
 
@@ -35,7 +35,7 @@ echo(Component\TkStarJDC::date('Y/m/d H:i:s', strtotime('2000-02-05 12:30:00')))
 ```
 
 
-## Jalali to Gregorian and Gregorian to Jalali Convertering:
+## Jalali to Gregorian and Gregorian to Jalali Converting:
 ```
 <?php
 use \TkStar\LaunchPad\Components as Component;
@@ -70,18 +70,18 @@ $array = Component\TkStarJDC::Occasions('2000/02/05', 'gregorian'); // Result =>
 ```
 
 
-## Jalali Occasions Sample:
+## Occasions Sample:
 ```
 <?php
 use \TkStar\LaunchPad\Components as Component;
 
 $array = Component\TkStarJDC::Occasions('1378-11-16', 'jalali'); // Result => Array ( ... )
 
-$array = Component\TkStarJDC::Occasions('1378/11/16', 'jalali'); // Result => Array ( ... )
+$array = Component\TkStarJDC::Occasions('1378/11/16', 'gregorian'); // Result => Array ( ... )
 
 $array = Component\TkStarJDC::Occasions('2000-02-05', 'jalali'); // Result => Array ( ... )
 
-$array = Component\TkStarJDC::Occasions('2000/02/05', 'jalali'); // Result => Array ( ... )
+$array = Component\TkStarJDC::Occasions('2000/02/05', 'gregorian'); // Result => Array ( ... )
 ?>
 ```
 
