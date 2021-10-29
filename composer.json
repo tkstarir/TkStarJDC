@@ -1,27 +1,27 @@
 {
-	"name": "TkStarIR/TkStarJDC",
-	"description": "TkStar Jalali Date Class + Occasions and Holidays for LuanchPad Framework",
-	"keywords": [
-		"jalali date function",
-		"jdf",
-		"jdc",
-		"tkstarjdc"
-	],
-	"type": "plugin",
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "TkStar Company",
-			"email": "info@tkstar.ir"
-		}
-	],
-	"autoload": {
-		"files": ["src/TkStarJDC.php"]
-	},
-	"minimum-stability": "dev",
-	"prefer-stable": true,
-	"require": {
-		"php": ">=8.0"
-	},
-	"scripts": {}
+    "name": "tkstarir/tkstarjdc",
+    "description": "TkStar Jalali Date Class + Occasions and Holidays for LuanchPad Framework",
+    "keywords": [
+        "jalali date function",
+        "jdf",
+        "jdc",
+        "tkstarjdc"
+    ],
+    "type": "plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TkStar Company",
+            "email": "info@tkstar.ir"
+        }
+    ],
+    "autoload": {
+        "files": ["src/TkStarJDC.php"]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.0"
+    },
+    "scripts": {}
 }
