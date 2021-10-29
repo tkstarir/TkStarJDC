@@ -1,12 +1,15 @@
 # TkStarJDC
 
-TkStar Jalali Date Class + **Occasions** and **Holidays**
+TkStar Jalali Date Class + _Occasions_ and _Holidays_
 
-Fully comprehensive PHP library for jalali and gregorian date converting to each other with **Occasions** of both gregorian and galali in a Single Class
+Fully comprehensive PHP library for Jalali and Gregorian date converting to each other with _Occasions_ and _Holidays_ of both Gregorian and galali in a Single Class
 
-Coming Soon: Lunar support for **Occasions**, **Holidays** and Date Converting ...
+Coming Soon: Lunar support for _Occasions_, _Holidays_ and Date Converting ...
 
-Date Converter Symbols: **_a A c d D F g G h H i j l m M n r s S t w W Y U z_**
+Date Converter Symbols: __a A c d D F g G h H i j l m M n r s S t w W Y U z__
+
+## Part of TkStar LaunchPad Framework
+**_This Package is a part of [LaunchPad Framework](https://github.com/TkStarIR/LaunchPad)_**
 
 
 ## Date Converter Samples:
