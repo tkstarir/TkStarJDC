@@ -35,7 +35,7 @@ echo(Component\TkStarJDC::date('Y/m/d H:i:s', strtotime('2000-02-05 12:30:00')))
 ```
 
 
-## "Jalali" to "Gregorian" & "Gregorian" => "Jalali" Converter Samples:
+## Jalali to Gregorian and Gregorian to Jalali Convertering:
 ```
 <?php
 use \TkStar\LaunchPad\Components as Component;
