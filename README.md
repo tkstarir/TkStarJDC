@@ -88,4 +88,27 @@ $array = Component\TkStarJDC::Occasions('2000/02/05', 'gregorian'); // Result =>
 ?>
 ```
 
+## Distance between two gregorian dates based on Year, Month, Days, Hours, Minutes and Days:
+```
+<?php
+use \TkStar\LaunchPad\Components as Component;
+
+$check_distance = Component\TkStarJDC::Check_Distance('2022-11-09', '2000-02-05'); // Result => Array ( ... )
+
+var_export($check_distance);
+
+/*
+  array (
+    'is_reverse' => false,
+    'total_seconds' => 718243200.0,
+    'years' => 22,
+    'months' => 4,
+    'days' => 5,
+    'hours' => 0,
+    'minutes' => 0,
+    'seconds' => 0.0,
+  )
+*/
+```
+
 **_Lunar Support for All of Above Types and Methods: Coming Soon ..._**
