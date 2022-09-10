@@ -2,28 +2,30 @@
 
 namespace LaunchPad\Components {
 
-	// Check for existence of class
-	if(!class_exists(__NAMESPACE__ . '\\Collection')){
+	if(!class_exists(__NAMESPACE__ . '\\TkStarJDC')){
 
-		// TkStarJDC for getting time by your identifiers with all details such as occasions and holidays
+		// TkStarJDC for getting time by your identifiers with all details such as occasions, holidays, diffrences and distances
 		class TkStarJDC {
 
-			// @property:public String $timezone | default 'default'
-			public static $timezone = 'default';
+			// @property:public String $timezone
+			protected static ?String $timezone = null;
 
-			// @property:public String $requests_agent | default 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0'
-			public static $requests_agent = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0';
+			// @property:public String $requests_agent
+			protected static ?String $requests_agent = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0';
 
-			// Convert your identifiers to jalali date
-			// @variable ?String $type | default null
-			// @variable Integer $time | default 0
-			// @return ?String
+			/**
+				* Convert your identifiers to jalali date
+				* 
+				* @param String|Null $type
+				* @param Int $time
+				* @return String|Null
+			*/
 			public static function date(?String $type = null, Int $time = 0) : ?String {
 				(self::$timezone == 'default' ? '' : date_default_timezone_set(self::$timezone));
 				$current_timezone = date_default_timezone_get();
 				$result = array();
 				$time = (empty($time) OR $time == 0) ? time() : $time;
-				$jalali_date = self::GregorianToJalali(date('Y', $time), date('m', $time), date('d', $time));
+				$jalali_date = self::Gregorian_To_Jalali(date('Y', $time), date('m', $time), date('d', $time));
 				$jalali_year = $jalali_date[0];
 				$jalali_month = $jalali_date[1];
 				$jalali_day = $jalali_date[2];
@@ -36,25 +38,25 @@ namespace LaunchPad\Components {
 							$jalali_day = mb_substr($jalali_day, 0, 1, 'utf-8') == '0' ? mb_substr($jalali_day, 1, (strlen($jalali_day) - 1), 'utf-8') : $jalali_day;
 							$result[] = $jalali_day <= 9 ? '0' . $jalali_day : $jalali_day;
 						break;
-						case('D'): $result[] = self::DaysOfWeek(date('D', $time), true); break;
-						case('F'): $result[] = self::MonthName($jalali_month, false); break;
+						case('D'): $result[] = self::Days_Of_Week(date('D', $time), true); break;
+						case('F'): $result[] = self::Month_Name($jalali_month, false); break;
 						case('g'): $result[] = date('g', $time); break;
 						case('G'): $result[] = date('G', $time); break;
 						case('h'): $result[] = date('h', $time); break;
 						case('H'): $result[] = date('H', $time); break;
 						case('i'): $result[] = date('i', $time); break;
 						case('j'): $result[] = $jalali_day; break;
-						case('l'): $result[] = self::DaysOfWeek(date('l', $time), false); break;
+						case('l'): $result[] = self::Days_Of_Week(date('l', $time), false); break;
 						case('m'):
 							$jalali_month = mb_substr($jalali_month, 0, 1, 'utf-8') == '0' ? mb_substr($jalali_month, 1, (strlen($jalali_month) - 1), 'utf-8') : $jalali_month;
 							$result[] = $jalali_month <= 9 ? '0' . $jalali_month : $jalali_month;
 							break;
-						case('M'): $result[] = self::MonthName($jalali_month, true); break;
+						case('M'): $result[] = self::Month_Name($jalali_month, true); break;
 						case('n'): $result[] = $jalali_month; break;
 						case('r'): $result[] = self::date('l, d F Y ساعت H:i:s', $time); break;
 						case('s'): $result[] = date('s', $time); break;
 						case('S'): $result[] = 'ام'; break;
-						case('t'): $result[] = self::LastDayOfMonth(date('Y', $time), $month, $day); break;
+						case('t'): $result[] = self::Last_Day_Of_Week(date('Y', $time), $month, $day); break;
 						case('w'):
 							$day_of_week = date('D', $time);
 							$day_of_week = mb_strtolower($day_of_week, 'utf-8');
@@ -66,11 +68,11 @@ namespace LaunchPad\Components {
 								case('wed'): $result[] = 4; break;
 								case('thu'): $result[] = 5; break;
 								case('friday'): $result[] = 6; break;
-								default: $result[] = 'نامشخص'; break;
-						        }
-						        break;
+								default: $result[] = null; break;
+								}
+								break;
 						case('W'):
-							$days = self::DaysOfYear($jalali_year, $jalali_month, $jalali_day);
+							$days = self::Days_Of_Year($jalali_year, $jalali_month, $jalali_day);
 							$weeks = $days / 7;
 							$weeks = floor($weeks);
 							break;
@@ -85,11 +87,14 @@ namespace LaunchPad\Components {
 				return $result;
 			}
 
-			// Get occasions of a day by it time
-			// @variable Mixed $time | default 'default'
-			// @variable ?String $occasions_type | default 'jalali'
-			// @return Array
-			public static function Occasions(Mixed $time = 'default', ?String $occasions_type = 'jalali') : Array {
+			/**
+				* Get occasions of a day by it's time
+				* 
+				* @param String|Null|Int $time
+				* @param String|Null $occasions_type
+				* @return Array
+			*/
+			public static function Occasions(String | Null | Int $time = 'default', ?String $occasions_type = 'jalali') : Array {
 				$output = array('count' => 0, 'month_name' => '', 'jalali_date' => '', 'gregorian_date' => '', 'time' => '', 'occasions' => array());
 				$occasions_type = mb_strtolower($occasions_type, 'utf-8');
 				$occasions_type = in_array($occasions_type, array('gregorian', 'jalali')) ? $occasions_type : 'jalali';
@@ -99,7 +104,7 @@ namespace LaunchPad\Components {
 				if(strtotime($real_time) <= 0){
 					$real_time_split = explode('/', $real_time);
 					$real_time_split_day = (isset($real_time_split[2]) AND !empty($real_time_split[2]) AND $real_time_split[2] >= 1) ? $real_time_split[2] : 1;
-					$real_time_gregorian = self::JalaliToGregorian($real_time_split[0], $real_time_split[1], $real_time_split_day);
+					$real_time_gregorian = self::Jalali_To_Gregorian($real_time_split[0], $real_time_split[1], $real_time_split_day);
 					$real_time = $real_time_gregorian[0] . '/' . $real_time_gregorian[1];
 					$real_time = (isset($real_time_split[2]) AND !empty($real_time_split[2]) AND $real_time_split[2] >= 1) ? ($real_time . '/' . $real_time_gregorian[2]) : ($real_time . '/0');
 				}
@@ -147,9 +152,9 @@ namespace LaunchPad\Components {
 								preg_match('/\<span(.*?)\>(.*?)\<\/span\>/imuxs', $text, $day_details);
 								$occasion_details = preg_replace('/\<span(.*?)\>(.*?)\<\/span\>(.*?)\<span(.*?)\>(.*?)\<\/span\>/imuxs', '$3', $text);
 								$occasion_details = str_replace(array('</span>'), array(''), $occasion_details);
-								$day = trim(self::ConvertToEnglishNumbers(preg_replace('/\D/imuxs', '', $day_details[2])));
+								$day = trim(self::Convert_To_English_Numbers(preg_replace('/\D/imuxs', '', $day_details[2])));
 								$holiday = strpos($occasions[0][$i], 'eventHoliday') !== false ? 'true' : 'false';
-								$day_time = join('-', self::JalaliToGregorian(self::date('Y', $real_time), self::date('m', $real_time), $day));
+								$day_time = join('-', self::Jalali_To_Gregorian(self::date('Y', $real_time), self::date('m', $real_time), $day));
 								$day_time = strtotime($day_time);
 								$output['occasions'][$day] = array('day' => $day, 'jalali_date' => self::date('Y/m/d', $day_time), 'gregorian_date' => date('Y-m-d', $day_time), 'time' => $day_time, 'occasion' => preg_replace('/[^ ا-ی]/imuxs', '', $occasion_details), 'is_holiday_for_jalali' => $holiday);
 							}
@@ -160,22 +165,28 @@ namespace LaunchPad\Components {
 				}
 			}
 
-			// Convert persian numbers to it english format
-			// @variable ?String $number | default null
-			// @return ?String
-			public static function ConvertToEnglishNumbers(?String $number = null) : ?String {
+			/**
+				* Convert persian numbers to their's english format
+				* 
+				* @param String|Null $number
+				* @return String|Null
+			*/
+			public static function Convert_To_English_Numbers(?String $number = null) : ?String {
 				$number = trim($number);
 				$number = str_replace(array('۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '۰'), array('1', '2', '3', '4', '5', '6', '7', '8', '9', '0'), $number);
 				settype($number, 'String');
 				return($number);
 			}
 
-			// Convert jalali year, month and date to them gregorian format
-			// @variable Integer $jalali_year | default 0
-			// @variable Integer $jalali_month | default 0
-			// @variable Integer $jalali_day | default 0
-			// @return Array
-			public static function JalaliToGregorian(Int $jalali_year = 0, Int $jalali_month = 0, Int $jalali_day = 0) : Array {
+			/**
+				* Convert jalali year, month and date to their's gregorian format
+				* 
+				* @param Int $jalali_year
+				* @param Int $jalali_month
+				* @param Int $jalali_day
+				* @return Array
+			*/
+			public static function Jalali_To_Gregorian(Int $jalali_year = 0, Int $jalali_month = 0, Int $jalali_day = 0) : Array {
 				$gregorian_days_of_months = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 				$jalali_days_of_months = array(31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29);   
 				$jalali_year = $jalali_year - 979;
@@ -220,21 +231,27 @@ namespace LaunchPad\Components {
 				return array($gregorian_year, $gregorian_month, $gregorian_day);
 			}
 
-			// Get full date of your entire timestamp
-			// @variable Integer $time | default 0
-			// @return Array
-			public static function FullDate($time = 0) : Array {
+			/**
+				* Get full date of your entire timestamp
+				* 
+				* @param Int $time
+				* @return Array
+			*/
+			public static function Full_Date(Int $time = 0) : Array {
 				$time = (empty($time) OR $time == 0) ? time() : $time;
-				$output = array('seconds' => self::date('s', $time), 'minutes' => self::date('i', $time), 'hours' => self::date('H', $time), 'day' => self::date('d', $time), 'month' => self::date('m', $time), 'year' => self::date('Y', $time), 'day_of_week' => self::date('w', $time), 'day_of_month' => self::date('j', $time), 'day_of_year' => self::DaysOfYear(self::date('Y', $time), self::date('m', $time), self::date('d', $time)), 'weekday' => self::date('l', $time), 'month_name' => self::date('F', $time), 'year_kabise' => self::CheckKabise(date('Y', $time)) ? 'true' : 'false', 'full_date' => self::date('r', $time));
+				$output = array('seconds' => self::date('s', $time), 'minutes' => self::date('i', $time), 'hours' => self::date('H', $time), 'day' => self::date('d', $time), 'month' => self::date('m', $time), 'year' => self::date('Y', $time), 'day_of_week' => self::date('w', $time), 'day_of_month' => self::date('j', $time), 'day_of_year' => self::Days_Of_Year(self::date('Y', $time), self::date('m', $time), self::date('d', $time)), 'weekday' => self::date('l', $time), 'month_name' => self::date('F', $time), 'year_kabise' => self::Check_Kabise(date('Y', $time)) ? 'true' : 'false', 'full_date' => self::date('r', $time));
 				return($output);
 			}
 
-			// Convert gregorian year, month and date to them jalali format
-			// @variable Integer $gregorian_year | default 0
-			// @variable Integer $gregorian_month | default 0
-			// @variable Integer $gregorian_day | default 0
-			// @return Array
-			public static function GregorianToJalali(Int $gregorian_year = 0, Int $gregorian_month = 0, Int $gregorian_day = 0) : Array {
+			/**
+				* Convert gregorian year, month and date to their's jalali format
+				* 
+				* @param Int $gregorian_year
+				* @param Int $gregorian_month
+				* @param Int $gregorian_day
+				* @return Array
+			*/
+			public static function Gregorian_To_Jalali(Int $gregorian_year = 0, Int $gregorian_month = 0, Int $gregorian_day = 0) : Array {
 				$gregorian_days_of_months = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 				$jalali_days_of_months = array(31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29);   
 				$gregorian_year = $gregorian_year - 1600;
@@ -268,21 +285,24 @@ namespace LaunchPad\Components {
 				return(array($jalali_year, $jalali_month, $jalali_day));
 			}
 
-			// Get last days of a month by it year and dat
-			// @variable Integer $year | default 0
-			// @variable Integer $month | default 0
-			// @variable Integer $day | default 0
-			// @return Int
-			public static function LastDayOfMonth(Int $year = 0, Int $month = 0, Int $day = 0) : Int {
+			/**
+				* Get last days of a month by it's date
+				* 
+				* @param Int $year
+				* @param Int $month
+				* @param Int $day
+				* @return Int
+			*/
+			public static function Last_Day_Of_Week(Int $year = 0, Int $month = 0, Int $day = 0) : Int {
 				$jalali_day_2 = $jalali_date = $jalali_day = '';
 				$last_day_gregorian = date('d', mktime(0, 0, 0, ($month + 1), 0, $year));
-				$jalali = self::GregorianToJalali($year, $month, $day);
+				$jalali = self::Gregorian_To_Jalali($year, $month, $day);
 				$jalali_year = $jalali[0];
 				$jalali_day = $last_day = $jalali[2];
 				while($jalali_day_2 != '1'){
 					if($day < $last_day_gregorian){
 						$day++;
-						$jalali = self::GregorianToJalali($year, $month, $day);
+						$jalali = self::Gregorian_To_Jalali($year, $month, $day);
 						$jalali_year = $jalali[0];
 						$jalali_day_2 = $jalali[2];
 						if($jalali_day_2 == '1'){
@@ -303,11 +323,14 @@ namespace LaunchPad\Components {
 				return($last_day);
 			}
 
-			// Get month short and full name of a month by it number
-			// @variable ?String $month | default null
-			// @variable Boolean $short | default false
-			// @return ?String
-			public static function MonthName(?String $month = null, Bool $short = false) : ?String {
+			/**
+				* Get month short and full name of a month by it's number
+				* 
+				* @param String|Null $month
+				* @param Bool $short
+				* @return String|Null
+			*/
+			public static function Month_Name(?String $month = null, Bool $short = false) : ?String {
 				switch($month){
 					case(1): case('01'): case('1'): $month = 'فروردین'; break;
 					case(2): case('02'): case('2'): $month = 'اردیبهشت'; break;
@@ -321,17 +344,20 @@ namespace LaunchPad\Components {
 					case(10): case('10'): case('10'): $month = 'دی'; break;
 					case(11): case('11'): case('11'): $month = 'بهمن'; break;
 					case(12): case('12'): case('12'): $month = 'اسفند'; break;
-					default: $month = 'نامشخص'; break;
+					default: $month = null; break;
 				}
 				$month = $short ? mb_substr($month, 0, 3, 'utf-8') : $month;
 				return($month);
 			}
 
-			// Get day short and full name of a week by it number
-			// @variable ?String $day | default null
-			// @variable Boolean $short | default false
-			// @return ?String
-			public static function DaysOfWeek(?String $day = null, Bool $short = false) : ?String {
+			/**
+				* Get short and full name of a week by it's number
+				* 
+				* @param String|Null $day
+				* @param Bool $short
+				* @return String|Null
+			*/
+			public static function Days_Of_Week(?String $day = null, Bool $short = false) : ?String {
 				$day = mb_strtolower($day, 'utf-8');
 				switch($day){
 					case('sat'): case('saturday'): $day = 'شنبه'; break;
@@ -341,46 +367,103 @@ namespace LaunchPad\Components {
 					case('wed'): case('wednesday'): $day = 'چهار شنبه'; break;
 					case('thu'): case('thursday'): $day = 'پنج شنبه'; break;
 					case('friday'): case('friday'): $day = 'جمعه'; break;
-					default: $day = 'نامشخص'; break;
+					default: $day = null; break;
 				}
 				$day = $short ? mb_substr($day, 0, 1, 'utf-8') : $day;
 				return($day);
 			}
 
-			// Divergence of a number to another one
-			// @variable Integer $diver | default 0
-			// @variable Integer $divergence_to | default 0
-			// @return Int
-			public static function Divergence(Int $diver = 0, Int $divergence_to = 0) : Int {
-				$output = $diver / $divergence_to;
+			/**
+				* Divergence of a number to another one
+				* 
+				* @param Int $divergence_base
+				* @param Int $divergence_to
+				* @return Float|Int
+			*/
+			public static function Divergence(Int $divergence_base = 0, Int $divergence_to = 0) : Float | Int {
+				$output = $divergence_base / $divergence_to;
 				settype($output, 'Int');
 				return($output);
 			}
 
-			// Get days of a year by it week and day
-			// @variable Integer $jalali_year | default 0
-			// @variable Integer $jalali_month | default 0
-			// @variable Integer $jalali_day | default 0
-			// @return Int
-			public static function DaysOfYear(Int $jalali_year = 0, Int $jalali_month = 0, Int $jalali_day = 0) : Int {
+			/**
+				* Get days of a year by it's date
+				* 
+				* @param Int $jalali_year
+				* @param Int $jalali_month
+				* @param Int $jalali_day
+				* @return Int
+			*/
+			public static function Days_Of_Year(Int $jalali_year = 0, Int $jalali_month = 0, Int $jalali_day = 0) : Int {
 				$result = 0;
 				if($jalali_month == 1){
 					return($jalali_day);
 				}else{
 					for($i = 1; $i < $jalali_month OR $i == 12; $i++){
-						$gregorian_date = self::JalaliToGregorian($jalali_year, $jalali_month, $jalali_day);
-						$result += self::LastDayOfMonth($gregorian_date[0], $gregorian_date[1], $gregorian_date[2]);
+						$gregorian_date = self::Jalali_To_Gregorian($jalali_year, $jalali_month, $jalali_day);
+						$result += self::Last_Day_Of_Week($gregorian_date[0], $gregorian_date[1], $gregorian_date[2]);
 					}
 					$output = $result + $jalali_day;
 					return($output);
 				}
 			}
 
-			// Check a year is kabise or not
-			// @variable Mixed $gregorian_year | default 0
-			// @return Boolean
-			public static function CheckKabise(Mixed $gregorian_year) : Bool {
+			/**
+				* Check a year is kabise or not
+				* 
+				* @param Mixed $gregorian_year
+				* @return Bool
+			*/
+			public static function Check_Kabise(Mixed $gregorian_year) : Bool {
 				return((($gregorian_year % 4) == 0 AND ($gregorian_year % 100) != 0) ? true : false);
+			}
+
+			/**
+				* Get distance between two gregorian dates
+				* 
+				* @param String|Null|Int $from_date
+				* @param String|Null|Int $to_date
+				* @return Bool
+			*/
+			public static function Check_Distance(String | Null | Int $from_date = null, String | Null | Int $to_date = null) : Array {
+				$from_date = is_string($from_date) ? strtotime($from_date) : $from_date;
+				$to_date = is_string($to_date) ? strtotime($to_date) : $to_date;
+				$date = round($from_date - $to_date, 0);
+				$is_reverse = $date < 0 ? true : false;
+				$date = abs($date);
+				$output = array('is_reverse' => $is_reverse, 'total_seconds' => $date, 'years' => null, 'months' => null, 'days' => null, 'hours' => null, 'minutes' => null, 'seconds' => null);
+				do {
+					$date -= 60;
+					is_null($output['minutes']) ? $output['minutes'] = 0 : '';
+					$output['minutes']++;
+					if($output['minutes'] >= 60){
+						is_null($output['hours']) ? $output['hours'] = 0 : '';
+						$output['minutes'] = 0;
+						$output['hours']++;
+					}
+					if($output['hours'] >= 24){
+						is_null($output['days']) ? $output['days'] = 0 : '';
+						$output['hours'] = 0;
+						$output['days']++;
+					}
+					if($output['days'] >= 31){
+						is_null($output['months']) ? $output['months'] = 0 : '';
+						$output['days'] = 0;
+						$output['months']++;
+					}
+					if($output['months'] >= 12){
+						is_null($output['years']) ? $output['years'] = 0 : '';
+						$output['months'] = 0;
+						$output['years']++;
+					}
+				}while($date >= 60);
+				$output['seconds'] = $date;
+				if($output['years'] === null)unset($output['years']);
+				if($output['months'] === null)unset($output['months']);
+				if($output['days'] === null)unset($output['days']);
+				if($output['hours'] === null)unset($output['hours']);
+				if($output['minutes'] === null)unset($output['minutes']);
+				return($output);
 			}
 
 		}
