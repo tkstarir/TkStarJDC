@@ -7,7 +7,6 @@ Fully comprehensive PHP library for Jalali and Gregorian date converting to each
 Coming Soon: Lunar support for _Occasions_, _Holidays_ and Date Converting ...
 
 ## Table of Contents
------------------
 * [TkStarJDC library description](#where-come-from-this-package)
 * [Converting dates to each other formats](#jalali-to-gregorian-and-gregorian-to-jalali-converting)
 * [Gregorian occasions](#gregorian-occasions)
